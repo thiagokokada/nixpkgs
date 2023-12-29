@@ -6,6 +6,11 @@ on:
 
 jobs:
   sync-fork:
+    strategy:
+      matrix:
+        branch:
+          - master
+          - staging
     runs-on: ubuntu-latest
     steps:
       - name: Sync fork with upstream
@@ -15,5 +20,5 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/merge-upstream \
-            -d '{"branch":"master"}'
+            -d '{"branch":"${{ matrix.branch }}"}'
 
