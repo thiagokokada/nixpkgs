@@ -11,11 +11,9 @@ jobs:
         branch:
           - master
           - staging
-
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: thiagokokada/merge-upstream@v1.0.2
         with:
           branch: ${{ matrix.branch }}
+          token: ${{ secrets.PAT_TOKEN }}
