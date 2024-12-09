@@ -16,6 +16,11 @@ from .utils import Args, LogFormatter
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Build-time flags
+# Strings to avoid breaking standalone (e.g.: `python -m nixos_rebuild`) usage
+WITH_REEXEC = "@withReexec@"
+WITH_SHELL_FILES = "@withShellFiles@"
+
 
 def get_parser() -> tuple[argparse.ArgumentParser, dict[str, argparse.ArgumentParser]]:
     common_flags = argparse.ArgumentParser(add_help=False)
@@ -181,7 +186,7 @@ def parse_args(
     }
 
     if args.help or args.action is None:
-        if "@withShellFiles@" == "true":  # type: ignore
+        if WITH_SHELL_FILES == "true":
             r = run(["man", "8", "@executable@"], check=False)
             parser.exit(r.returncode)
         else:
@@ -298,7 +303,7 @@ def execute(argv: list[str]) -> None:
     # Re-exec to a newer version of the script before building to ensure we get
     # the latest fixes
     if (
-        "@withReexec@" == "true"  # type: ignore
+        WITH_REEXEC == "true"
         and can_run
         and not args.fast
         and not os.environ.get("_NIXOS_REBUILD_REEXEC")
