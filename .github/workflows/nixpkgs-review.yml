@@ -25,14 +25,30 @@ on:
         type: boolean
         default: false
         required: true
+      x86_64-linux:
+        type: boolean
+        description: "Build on x86_64-linux"
+        default: true
+        required: true
+      aarch64-darwin:
+        type: boolean
+        description: "Build on aarch64-darwin"
+        default: false
+        required: true
+      x86_64-darwin:
+        type: boolean
+        description: "Build on x86_64-darwin"
+        default: false
+        required: true
 
 concurrency:
   group: review-${{ github.event.inputs.pr }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: 'nixpkgs-review #${{ github.event.inputs.pr }}'
+  build-x86_64-linux:
+    name: 'nixpkgs-review #${{ github.event.inputs.pr }} on x86_64-linux'
+    if: ${{ github.event.inputs.x86_64-linux == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -61,6 +77,72 @@ jobs:
           nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
       - uses: actions/upload-artifact@v4
         with:
-          name: build-logs
+          name: build-logs-x86_64-linux
+          path: /nix/var/log/nix/drvs
+          include-hidden-files: true
+
+  build-aarch64-darwin:
+    name: 'nixpkgs-review #${{ github.event.inputs.pr }} on aarch64-darwin'
+    if: ${{ github.event.inputs.aarch64-darwin == 'true' }}
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/cache@v4
+        with:
+          path: nixpkgs
+          key: git-folder
+      - uses: actions/checkout@v4
+        with:
+          path: nixpkgs
+          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0
+      - uses: DeterminateSystems/nix-installer-action@v16
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Run review
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PR: ${{ github.event.inputs.pr }}
+          EXTRA_ARGS: ${{ github.event.inputs.extra-args }}
+        run: |
+          git config --global user.email "user@example.com"
+          git config --global user.name "user"
+          cd $GITHUB_WORKSPACE/nixpkgs
+          nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-aarch64-darwin
+          path: /nix/var/log/nix/drvs
+          include-hidden-files: true
+
+  build-x86_64-darwin:
+    name: 'nixpkgs-review #${{ github.event.inputs.pr }} on x86_64-darwin'
+    if: ${{ github.event.inputs.x86_64-darwin == 'true' }}
+    runs-on: macos-13
+
+    steps:
+      - uses: actions/cache@v4
+        with:
+          path: nixpkgs
+          key: git-folder
+      - uses: actions/checkout@v4
+        with:
+          path: nixpkgs
+          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0
+      - uses: DeterminateSystems/nix-installer-action@v16
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Run review
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PR: ${{ github.event.inputs.pr }}
+          EXTRA_ARGS: ${{ github.event.inputs.extra-args }}
+        run: |
+          git config --global user.email "user@example.com"
+          git config --global user.name "user"
+          cd $GITHUB_WORKSPACE/nixpkgs
+          nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-x86_64-darwin
           path: /nix/var/log/nix/drvs
           include-hidden-files: true
