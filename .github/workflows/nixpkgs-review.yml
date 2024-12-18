@@ -1,0 +1,66 @@
+name: nixpkgs-review PR
+run-name: 'nixpkgs-review #${{ github.event.inputs.pr }}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR number"
+        type: number
+        required: true
+      extra-args:
+        description: "Extra args for nixpkgs-review"
+        type: string
+        default: ""
+        required: false
+      branch:
+        type: choice
+        description: "Nixpkgs branch"
+        default: master
+        options:
+        - master
+        - staging
+      free-space:
+        description: "Run workflow to increase free space"
+        type: boolean
+        default: false
+        required: true
+
+concurrency:
+  group: review-${{ github.event.inputs.pr }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: 'nixpkgs-review #${{ github.event.inputs.pr }}'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: thiagokokada/free-disk-space@main
+        if: ${{ github.event.inputs.free-space == 'true' }}
+      - uses: actions/cache@v4
+        with:
+          path: nixpkgs
+          key: git-folder
+      - uses: actions/checkout@v4
+        with:
+          path: nixpkgs
+          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0
+      - uses: DeterminateSystems/nix-installer-action@v16
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Run review
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PR: ${{ github.event.inputs.pr }}
+          EXTRA_ARGS: ${{ github.event.inputs.extra-args }}
+        run: |
+          git config --global user.email "user@example.com"
+          git config --global user.name "user"
+          cd $GITHUB_WORKSPACE/nixpkgs
+          nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: /nix/var/log/nix/drvs
+          include-hidden-files: true
