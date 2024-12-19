@@ -42,7 +42,10 @@
                 yj -jy < "$jsonPath" > $out/${name}.yml
                 action-validator -v $out/${name}.yml
               '';
-          ghActionsYAMLs = map mkGHActionsYAML [ "nixpkgs-review" ];
+          ghActionsYAMLs = map mkGHActionsYAML [
+            "nixpkgs-review"
+            "sync-fork"
+          ];
         in
         {
           generate-gh-actions = pkgs.writeShellScriptBin "generate-gh-actions" ''
