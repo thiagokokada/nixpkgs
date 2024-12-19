@@ -45,6 +45,11 @@ concurrency:
   group: review-${{ github.event.inputs.pr }}
   cancel-in-progress: true
 
+env:
+  GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+  PR: ${{ github.event.inputs.pr }}
+  EXTRA_ARGS: ${{ github.event.inputs.extra-args }}
+
 jobs:
   build-x86_64-linux:
     name: 'nixpkgs-review #${{ github.event.inputs.pr }} on x86_64-linux'
@@ -52,6 +57,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Link to PR
+        run: echo "https://github.com/NixOS/nixpkgs/pull/$PR"
       - uses: thiagokokada/free-disk-space@main
         if: ${{ github.event.inputs.free-space == 'true' }}
       - uses: actions/cache@v4
@@ -66,10 +73,6 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v16
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Run review
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          PR: ${{ github.event.inputs.pr }}
-          EXTRA_ARGS: ${{ github.event.inputs.extra-args }}
         run: |
           git config --global user.email "user@example.com"
           git config --global user.name "user"
@@ -87,6 +90,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Link to PR
+        run: echo "https://github.com/NixOS/nixpkgs/pull/$PR"
       - uses: actions/cache@v4
         with:
           path: nixpkgs
@@ -99,10 +104,6 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v16
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Run review
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          PR: ${{ github.event.inputs.pr }}
-          EXTRA_ARGS: ${{ github.event.inputs.extra-args }}
         run: |
           git config --global user.email "user@example.com"
           git config --global user.name "user"
@@ -120,6 +121,8 @@ jobs:
     runs-on: macos-13
 
     steps:
+      - name: Link to PR
+        run: echo "https://github.com/NixOS/nixpkgs/pull/$PR"
       - uses: actions/cache@v4
         with:
           path: nixpkgs
@@ -132,10 +135,6 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v16
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Run review
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          PR: ${{ github.event.inputs.pr }}
-          EXTRA_ARGS: ${{ github.event.inputs.extra-args }}
         run: |
           git config --global user.email "user@example.com"
           git config --global user.name "user"
