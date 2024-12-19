@@ -116,5 +116,31 @@
     in
     (nixpkgsReviewForArch "x86_64-linux" "ubuntu-latest" true)
     // (nixpkgsReviewForArch "aarch64-darwin" "macos-latest" false)
-    // (nixpkgsReviewForArch "x86_64-darwin" "macos-13" false);
+    // (nixpkgsReviewForArch "x86_64-darwin" "macos-13" false)
+    // {
+      notify = {
+        name = "Notify Telegram";
+        needs = [
+          "build-x86_64-linux"
+          "build-aarch64-darwin"
+          "build-x86_64-darwin"
+        ];
+        runs-on = "ubuntu-latest";
+        "if" = "always()"; # Ensures this job runs even if others fail
+        steps = [
+          {
+            uses = "appleboy/telegram-action@v1.0.1";
+            "with" = {
+              to = ''''${{ secrets.TELEGRAM_TO }}'';
+              token = ''''${{ secrets.TELEGRAM_TOKEN }}'';
+              message = ''
+                Finished nixpkgs-review for PR: https://github.com/NixOS/nixpkgs/pull/''${{ github.event.inputs.pr }}
+
+                Run report: https://github.com/''${{ github.repository }}/actions/runs/''${{ github.run_id }}
+              '';
+            };
+          }
+        ];
+      };
+    };
 }
