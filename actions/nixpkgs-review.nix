@@ -1,3 +1,7 @@
+{ lib }:
+let
+  recursiveMergeAttrs = builtins.foldl' lib.recursiveUpdate { };
+in
 {
   name = "nixpkgs-review PR";
   run-name = ''nixpkgs-review #''${{ github.event.inputs.pr }}'';
@@ -47,84 +51,101 @@
         // (archOpt "x86_64-darwin");
     };
   };
+
   concurrency = {
     group = ''review-''${{ github.event.inputs.pr }}'';
     cancel-in-progress = true;
   };
+
   env = {
     GITHUB_TOKEN = ''''${{ secrets.PAT_TOKEN }}'';
     PR = ''''${{ github.event.inputs.pr }}'';
     EXTRA_ARGS = ''''${{ github.event.inputs.extra-args }}'';
   };
+
   jobs =
     let
-      optionalAttrs = boolean: attrs: if boolean then attrs else { };
-      nixpkgsReviewForArch = arch: runs-on: free-disk: {
-        "build-${arch}" = {
-          inherit runs-on;
-          name = ''nixpkgs-review #''${{ github.event.inputs.pr }} on ${arch}'';
-          "if" = ''''${{ github.event.inputs.build-on-${arch} == 'true' }}'';
+      nixpkgsReviewForArch =
+        {
+          arch,
+          runs-on,
+          enable-free-disk ? false,
+        }:
+        {
+          "build-${arch}" = {
+            inherit runs-on;
+            name = ''nixpkgs-review #''${{ github.event.inputs.pr }} on ${arch}'';
+            "if" = ''''${{ github.event.inputs.build-on-${arch} == 'true' }}'';
 
-          steps = (
-            builtins.filter (s: s != { }) [
-              {
-                name = "Link to PR";
-                run = ''echo https://github.com/NixOS/nixpkgs/pull/$PR'';
-              }
-              (optionalAttrs free-disk {
-                uses = "thiagokokada/free-disk-space@main";
-                "if" = ''''${{ github.event.inputs.free-space == 'true' }}'';
-              })
-              {
-                uses = "actions/cache@v4";
-                "with" = {
-                  path = "nixpkgs";
-                  key = "git-folder";
-                };
-              }
-              {
-                uses = "actions/checkout@v4";
-                "with" = {
-                  path = "nixpkgs";
-                  ref = ''''${{ github.event.inputs.branch }}'';
-                  fetch-depth = 0;
-                };
-              }
-              { uses = "DeterminateSystems/nix-installer-action@v16"; }
-              { uses = "DeterminateSystems/magic-nix-cache-action@v8"; }
-              {
-                name = "Run review";
-                run = ''
-                  git config --global user.email "user@example.com"
-                  git config --global user.name "user"
-                  cd $GITHUB_WORKSPACE/nixpkgs
-                  nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
-                '';
-              }
-              {
-                uses = "actions/upload-artifact@v4";
-                "with" = {
-                  name = "build-logs-${arch}";
-                  path = "/nix/var/log/nix/drvs";
-                  include-hidden-files = true;
-                };
-              }
-            ]
-          );
+            steps = (
+              builtins.filter (s: s != { }) [
+                {
+                  name = "Link to PR";
+                  run = ''echo https://github.com/NixOS/nixpkgs/pull/$PR'';
+                }
+                (lib.optionalAttrs enable-free-disk {
+                  uses = "thiagokokada/free-disk-space@main";
+                  "if" = ''''${{ github.event.inputs.free-space == 'true' }}'';
+                })
+                {
+                  uses = "actions/cache@v4";
+                  "with" = {
+                    path = "nixpkgs";
+                    key = "git-folder";
+                  };
+                }
+                {
+                  uses = "actions/checkout@v4";
+                  "with" = {
+                    path = "nixpkgs";
+                    ref = ''''${{ github.event.inputs.branch }}'';
+                    fetch-depth = 0;
+                  };
+                }
+                { uses = "DeterminateSystems/nix-installer-action@v16"; }
+                { uses = "DeterminateSystems/magic-nix-cache-action@v8"; }
+                {
+                  name = "Run review";
+                  run = ''
+                    git config --global user.email "user@example.com"
+                    git config --global user.name "user"
+                    cd $GITHUB_WORKSPACE/nixpkgs
+                    nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
+                  '';
+                }
+                {
+                  uses = "actions/upload-artifact@v4";
+                  "with" = {
+                    name = "build-logs-${arch}";
+                    path = "/nix/var/log/nix/drvs";
+                    include-hidden-files = true;
+                  };
+                }
+              ]
+            );
+          };
         };
-      };
+      archs = [
+        {
+          arch = "x86_64-linux";
+          runs-on = "ubuntu-latest";
+          enable-free-disk = true;
+        }
+        {
+          arch = "aarch64-darwin";
+          runs-on = "macos-latest";
+        }
+        {
+          arch = "x86_64-darwin";
+          runs-on = "macos-13";
+        }
+      ];
     in
-    (nixpkgsReviewForArch "x86_64-linux" "ubuntu-latest" true)
-    // (nixpkgsReviewForArch "aarch64-darwin" "macos-latest" false)
-    // (nixpkgsReviewForArch "x86_64-darwin" "macos-13" false)
+    recursiveMergeAttrs (builtins.map nixpkgsReviewForArch archs)
     // {
       notify = {
         name = "Notify Telegram";
-        needs = [
-          "build-x86_64-linux"
-          "build-aarch64-darwin"
-          "build-x86_64-darwin"
-        ];
+        needs = builtins.map (a: "build-${a.arch}") archs;
         runs-on = "ubuntu-latest";
         "if" = "always()"; # Ensures this job runs even if others fail
         steps = [

@@ -34,7 +34,7 @@
                   action-validator
                   yj
                 ];
-                json = builtins.toJSON (import ./actions/${name}.nix);
+                json = builtins.toJSON (import ./actions/${name}.nix { inherit (nixpkgs) lib; });
                 passAsFile = [ "json" ];
               }
               ''
