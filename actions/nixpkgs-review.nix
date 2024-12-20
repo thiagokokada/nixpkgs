@@ -21,7 +21,7 @@ in
         {
           pr = {
             description = "PR number";
-            type = "number";
+            type = "string";
             required = true;
           };
           extra-args = {

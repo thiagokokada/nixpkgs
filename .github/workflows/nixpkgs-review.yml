@@ -151,5 +151,5 @@ name: nixpkgs-review PR
       pr:
         description: PR number
         required: true
-        type: number
+        type: string
 run-name: 'nixpkgs-review #${{ github.event.inputs.pr }}'
