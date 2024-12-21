@@ -34,7 +34,9 @@ jobs:
         with:
           include-hidden-files: true
           name: build-logs-aarch64-darwin
-          path: /nix/var/log/nix/drvs
+          path: |
+            /nix/var/log/*/drvs
+            ~/.cache/nixpkgs-review/*/logs
   build-x86_64-darwin:
     if: ${{ github.event.inputs.build-on-x86_64-darwin == 'true' }}
     name: 'nixpkgs-review #${{ github.event.inputs.pr }} on x86_64-darwin'
@@ -63,7 +65,9 @@ jobs:
         with:
           include-hidden-files: true
           name: build-logs-x86_64-darwin
-          path: /nix/var/log/nix/drvs
+          path: |
+            /nix/var/log/*/drvs
+            ~/.cache/nixpkgs-review/*/logs
   build-x86_64-linux:
     if: ${{ github.event.inputs.build-on-x86_64-linux == 'true' }}
     name: 'nixpkgs-review #${{ github.event.inputs.pr }} on x86_64-linux'
@@ -94,7 +98,9 @@ jobs:
         with:
           include-hidden-files: true
           name: build-logs-x86_64-linux
-          path: /nix/var/log/nix/drvs
+          path: |
+            /nix/var/log/*/drvs
+            ~/.cache/nixpkgs-review/*/logs
   notify:
     if: success() || failure()
     name: Notify Telegram

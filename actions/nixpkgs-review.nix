@@ -117,7 +117,10 @@ in
                   uses = "actions/upload-artifact@v4";
                   "with" = {
                     name = "build-logs-${arch}";
-                    path = "/nix/var/log/nix/drvs";
+                    path = ''
+                      /nix/var/log/*/drvs
+                      ~/.cache/nixpkgs-review/*/logs
+                    '';
                     include-hidden-files = true;
                   };
                 }
