@@ -65,14 +65,15 @@ in
 
   jobs =
     let
+      stepName = args: "build-${args.arch}";
       nixpkgsReviewForArch =
         {
           arch,
           runs-on,
           enable-free-disk ? false,
-        }:
+        }@args:
         {
-          "build-${arch}" = {
+          ${stepName args} = {
             inherit runs-on;
             name = ''nixpkgs-review #''${{ github.event.inputs.pr }} on ${arch}'';
             "if" = ''''${{ github.event.inputs.build-on-${arch} == 'true' }}'';
@@ -148,7 +149,7 @@ in
     // {
       notify = {
         name = "Notify Telegram";
-        needs = builtins.map (a: "build-${a.arch}") archs;
+        needs = builtins.map stepName archs;
         runs-on = "ubuntu-latest";
         "if" = "always()"; # Ensures this job runs even if others fail
         steps = [
