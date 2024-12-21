@@ -96,7 +96,7 @@ jobs:
           name: build-logs-x86_64-linux
           path: /nix/var/log/nix/drvs
   notify:
-    if: always()
+    if: success() || failure()
     name: Notify Telegram
     needs:
       - build-x86_64-linux

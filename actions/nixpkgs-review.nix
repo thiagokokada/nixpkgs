@@ -147,7 +147,7 @@ in
         name = "Notify Telegram";
         needs = builtins.map (a: "build-${a.arch}") archs;
         runs-on = "ubuntu-latest";
-        "if" = "always()"; # Ensures this job runs even if others fail
+        "if" = "success() || failure()";
         steps = [
           {
             uses = "appleboy/telegram-action@v1.0.1";
