@@ -102,7 +102,7 @@ jobs:
             /nix/var/log/*/drvs
             ~/.cache/nixpkgs-review/*/logs
   notify:
-    if: success() || failure()
+    if: always()
     name: Notify Telegram
     needs:
       - build-x86_64-linux
