@@ -112,10 +112,15 @@ jobs:
     steps:
       - uses: appleboy/telegram-action@v1.0.1
         with:
-          message: |
+          message: |-
             Finished nixpkgs-review for PR: https://github.com/NixOS/nixpkgs/pull/${{ github.event.inputs.pr }}
 
             Run report: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Artifacts:
+            - x86_64-linux: ${{ steps.build-x86_64-linux.outputs.artifact-url }}
+            - aarch64-darwin: ${{ steps.build-aarch64-darwin.outputs.artifact-url }}
+            - x86_64-darwin: ${{ steps.build-x86_64-darwin.outputs.artifact-url }}
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
 name: nixpkgs-review PR

@@ -65,14 +65,15 @@ in
 
   jobs =
     let
+      stepName = a: "build-${a.arch}";
       nixpkgsReviewForArch =
         {
           arch,
           runs-on,
           enable-free-disk ? false,
-        }:
+        }@args:
         {
-          "build-${arch}" = {
+          "${stepName args}" = {
             inherit runs-on;
             name = ''nixpkgs-review #''${{ github.event.inputs.pr }} on ${arch}'';
             "if" = ''''${{ github.event.inputs.build-on-${arch} == 'true' }}'';
@@ -148,7 +149,7 @@ in
     // {
       notify = {
         name = "Notify Telegram";
-        needs = builtins.map (a: "build-${a.arch}") archs;
+        needs = builtins.map stepName archs;
         runs-on = "ubuntu-latest";
         "if" = "success() || failure()";
         steps = [
@@ -157,11 +158,17 @@ in
             "with" = {
               to = ''''${{ secrets.TELEGRAM_TO }}'';
               token = ''''${{ secrets.TELEGRAM_TOKEN }}'';
-              message = ''
-                Finished nixpkgs-review for PR: https://github.com/NixOS/nixpkgs/pull/''${{ github.event.inputs.pr }}
+              message =
+                ''
+                  Finished nixpkgs-review for PR: https://github.com/NixOS/nixpkgs/pull/''${{ github.event.inputs.pr }}
 
-                Run report: https://github.com/''${{ github.repository }}/actions/runs/''${{ github.run_id }}
-              '';
+                  Run report: https://github.com/''${{ github.repository }}/actions/runs/''${{ github.run_id }}
+
+                  Artifacts:
+                ''
+                + (builtins.concatStringsSep "\n" (
+                  builtins.map (a: ''- ${a.arch}: ''${{ steps.${stepName a}.outputs.artifact-url }}'') archs
+                ));
             };
           }
         ];
