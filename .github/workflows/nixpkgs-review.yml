@@ -24,10 +24,13 @@ jobs:
           ref: ${{ github.event.inputs.branch }}
       - uses: DeterminateSystems/nix-installer-action@v16
       - uses: DeterminateSystems/magic-nix-cache-action@v8
-      - name: Run review
+      - name: Configure git
         run: |
           git config --global user.email "user@example.com"
           git config --global user.name "user"
+      - continue-on-error: true
+        name: Run review
+        run: |
           cd $GITHUB_WORKSPACE/nixpkgs
           nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
       - uses: actions/upload-artifact@v4
@@ -55,10 +58,13 @@ jobs:
           ref: ${{ github.event.inputs.branch }}
       - uses: DeterminateSystems/nix-installer-action@v16
       - uses: DeterminateSystems/magic-nix-cache-action@v8
-      - name: Run review
+      - name: Configure git
         run: |
           git config --global user.email "user@example.com"
           git config --global user.name "user"
+      - continue-on-error: true
+        name: Run review
+        run: |
           cd $GITHUB_WORKSPACE/nixpkgs
           nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
       - uses: actions/upload-artifact@v4
@@ -88,10 +94,13 @@ jobs:
           ref: ${{ github.event.inputs.branch }}
       - uses: DeterminateSystems/nix-installer-action@v16
       - uses: DeterminateSystems/magic-nix-cache-action@v8
-      - name: Run review
+      - name: Configure git
         run: |
           git config --global user.email "user@example.com"
           git config --global user.name "user"
+      - continue-on-error: true
+        name: Run review
+        run: |
           cd $GITHUB_WORKSPACE/nixpkgs
           nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
       - uses: actions/upload-artifact@v4
@@ -102,7 +111,6 @@ jobs:
             /nix/var/log/*/drvs
             ~/.cache/nixpkgs-review/*/logs
   notify:
-    if: always()
     name: Notify Telegram
     needs:
       - build-x86_64-linux

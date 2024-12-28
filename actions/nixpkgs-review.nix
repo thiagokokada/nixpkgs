@@ -106,10 +106,16 @@ in
                 { uses = "DeterminateSystems/nix-installer-action@v16"; }
                 { uses = "DeterminateSystems/magic-nix-cache-action@v8"; }
                 {
-                  name = "Run review";
+                  name = "Configure git";
                   run = ''
                     git config --global user.email "user@example.com"
                     git config --global user.name "user"
+                  '';
+                }
+                {
+                  name = "Run review";
+                  continue-on-error = true;
+                  run = ''
                     cd $GITHUB_WORKSPACE/nixpkgs
                     nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
                   '';
@@ -151,7 +157,6 @@ in
         name = "Notify Telegram";
         needs = builtins.map stepName archs;
         runs-on = "ubuntu-latest";
-        "if" = "always()"; # Ensures this job runs even if others fail
         steps = [
           {
             uses = "appleboy/telegram-action@v1.0.1";
