@@ -151,7 +151,10 @@ in
         name = "Notify Telegram";
         needs = builtins.map stepName archs;
         runs-on = "ubuntu-latest";
-        "if" = "always()"; # Ensures this job runs even if others fail
+        # Ensures this job runs even if others fail
+        # https://github.com/orgs/community/discussions/26303#discussioncomment-4295106
+        "if" =
+          ''''${{ !cancelled() && (success() || failure() || needs.previous-job.result == 'skipped') }}'';
         steps = [
           {
             uses = "appleboy/telegram-action@v1.0.1";
