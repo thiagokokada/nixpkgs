@@ -65,7 +65,7 @@ in
 
   jobs =
     let
-      stepName = args: "build-${args.arch}";
+      stepName = arg: "build-${arg.arch}";
       nixpkgsReviewForArch =
         {
           arch,
@@ -77,6 +77,7 @@ in
             inherit runs-on;
             name = ''nixpkgs-review #''${{ github.event.inputs.pr }} on ${arch}'';
             "if" = ''''${{ github.event.inputs.build-on-${arch} == 'true' }}'';
+            outputs.built = ''''${{ steps.output.outputs.built }}'';
 
             steps = (
               builtins.filter (s: s != { }) [
@@ -106,12 +107,26 @@ in
                 { uses = "DeterminateSystems/nix-installer-action@v16"; }
                 { uses = "DeterminateSystems/magic-nix-cache-action@v8"; }
                 {
-                  name = "Run review";
+                  name = "Configure git";
                   run = ''
                     git config --global user.email "user@example.com"
                     git config --global user.name "user"
+                  '';
+                }
+                {
+                  name = "Run review";
+                  continue-on-error = true;
+                  run = ''
                     cd $GITHUB_WORKSPACE/nixpkgs
                     nix run .#nixpkgs-review -- pr $PR --print-result --post-result --no-shell $EXTRA_ARGS
+                  '';
+                }
+                {
+                  name = "Output";
+                  id = "output";
+                  run = ''
+                    built=$(jq -r '.result[].built | join(", ")' ~/.cache/nixpkgs-review/*/report.json)
+                    echo "built=$built" | tee -a "$GITHUB_OUTPUT"
                   '';
                 }
                 {
@@ -129,7 +144,7 @@ in
             );
           };
         };
-      archs = [
+      args = [
         {
           arch = "x86_64-linux";
           runs-on = "ubuntu-latest";
@@ -145,11 +160,11 @@ in
         }
       ];
     in
-    recursiveMergeAttrs (builtins.map nixpkgsReviewForArch archs)
+    recursiveMergeAttrs (builtins.map nixpkgsReviewForArch args)
     // {
       notify = {
         name = "Notify Telegram";
-        needs = builtins.map stepName archs;
+        needs = builtins.map stepName args;
         runs-on = "ubuntu-latest";
         "if" = "always()"; # Ensures this job runs even if others fail
         steps = [
@@ -158,11 +173,17 @@ in
             "with" = {
               to = ''''${{ secrets.TELEGRAM_TO }}'';
               token = ''''${{ secrets.TELEGRAM_TOKEN }}'';
-              message = ''
-                Finished nixpkgs-review for PR: https://github.com/NixOS/nixpkgs/pull/''${{ github.event.inputs.pr }}
+              message =
+                ''
+                  Finished nixpkgs-review for PR: https://github.com/NixOS/nixpkgs/pull/''${{ github.event.inputs.pr }}
 
-                Run report: https://github.com/''${{ github.repository }}/actions/runs/''${{ github.run_id }}
-              '';
+                  Run report: https://github.com/''${{ github.repository }}/actions/runs/''${{ github.run_id }}
+
+                  Packages built:
+                ''
+                + lib.concatStringsSep "\n" (
+                  builtins.map (a: ''- ${a.arch}: ''${{ needs.${stepName a}.outputs.built }}'') args
+                );
             };
           }
         ];
