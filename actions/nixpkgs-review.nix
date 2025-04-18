@@ -4,7 +4,7 @@ let
 in
 {
   name = "nixpkgs-review PR";
-  run-name = ''nixpkgs-review #''${{ github.event.inputs.pr }}'';
+  run-name = ''nixpkgs-review for PR ''${{ github.event.inputs.pr }}'';
   on = {
     workflow_dispatch = {
       inputs =
@@ -75,16 +75,12 @@ in
         {
           ${stepName args} = {
             inherit runs-on;
-            name = ''nixpkgs-review #''${{ github.event.inputs.pr }} on ${arch}'';
+            name = ''nixpkgs-review for PR ''${{ github.event.inputs.pr }} on ${arch}'';
             "if" = ''''${{ github.event.inputs.build-on-${arch} == 'true' }}'';
             outputs.built = ''''${{ steps.output.outputs.built }}'';
 
             steps = (
               builtins.filter (s: s != { }) [
-                {
-                  name = "Link to PR";
-                  run = ''echo "https://github.com/NixOS/nixpkgs/pull/''${PR//[^0-9]/}"'';
-                }
                 (lib.optionalAttrs enable-free-disk {
                   uses = "thiagokokada/free-disk-space@main";
                   "if" = ''''${{ github.event.inputs.free-space == 'true' }}'';
@@ -169,13 +165,19 @@ in
         "if" = "always()"; # Ensures this job runs even if others fail
         steps = [
           {
+            id = "pre_notify";
+            run = ''
+              echo "pr_link=https://github.com/NixOS/nixpkgs/pull/''${PR//[^0-9]/}" | tee -a "$GITHUB_OUTPUT"
+            '';
+          }
+          {
             uses = "appleboy/telegram-action@v1.0.1";
             "with" = {
               to = ''''${{ secrets.TELEGRAM_TO }}'';
               token = ''''${{ secrets.TELEGRAM_TOKEN }}'';
               message =
                 ''
-                  Finished nixpkgs-review for PR: https://github.com/NixOS/nixpkgs/pull/''${{ github.event.inputs.pr }}
+                  Finished nixpkgs-review for PR: ''${{ steps.pre_notify.outputs.pr_link }}
 
                   Run report: https://github.com/''${{ github.repository }}/actions/runs/''${{ github.run_id }}
 

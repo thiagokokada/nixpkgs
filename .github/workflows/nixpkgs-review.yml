@@ -8,13 +8,11 @@ env:
 jobs:
   build-aarch64-darwin:
     if: ${{ github.event.inputs.build-on-aarch64-darwin == 'true' }}
-    name: 'nixpkgs-review #${{ github.event.inputs.pr }} on aarch64-darwin'
+    name: nixpkgs-review for PR ${{ github.event.inputs.pr }} on aarch64-darwin
     outputs:
       built: ${{ steps.output.outputs.built }}
     runs-on: macos-latest
     steps:
-      - name: Link to PR
-        run: echo "https://github.com/NixOS/nixpkgs/pull/${PR//[^0-9]/}"
       - uses: actions/cache@v4
         with:
           key: git-folder
@@ -49,13 +47,11 @@ jobs:
             ~/.cache/nixpkgs-review/*/logs
   build-x86_64-darwin:
     if: ${{ github.event.inputs.build-on-x86_64-darwin == 'true' }}
-    name: 'nixpkgs-review #${{ github.event.inputs.pr }} on x86_64-darwin'
+    name: nixpkgs-review for PR ${{ github.event.inputs.pr }} on x86_64-darwin
     outputs:
       built: ${{ steps.output.outputs.built }}
     runs-on: macos-13
     steps:
-      - name: Link to PR
-        run: echo "https://github.com/NixOS/nixpkgs/pull/${PR//[^0-9]/}"
       - uses: actions/cache@v4
         with:
           key: git-folder
@@ -90,13 +86,11 @@ jobs:
             ~/.cache/nixpkgs-review/*/logs
   build-x86_64-linux:
     if: ${{ github.event.inputs.build-on-x86_64-linux == 'true' }}
-    name: 'nixpkgs-review #${{ github.event.inputs.pr }} on x86_64-linux'
+    name: nixpkgs-review for PR ${{ github.event.inputs.pr }} on x86_64-linux
     outputs:
       built: ${{ steps.output.outputs.built }}
     runs-on: ubuntu-latest
     steps:
-      - name: Link to PR
-        run: echo "https://github.com/NixOS/nixpkgs/pull/${PR//[^0-9]/}"
       - if: ${{ github.event.inputs.free-space == 'true' }}
         uses: thiagokokada/free-disk-space@main
       - uses: actions/cache@v4
@@ -140,10 +134,13 @@ jobs:
       - build-x86_64-darwin
     runs-on: ubuntu-latest
     steps:
+      - id: pre_notify
+        run: |
+          echo "pr_link=https://github.com/NixOS/nixpkgs/pull/${PR//[^0-9]/}" | tee -a "$GITHUB_OUTPUT"
       - uses: appleboy/telegram-action@v1.0.1
         with:
           message: |-
-            Finished nixpkgs-review for PR: https://github.com/NixOS/nixpkgs/pull/${{ github.event.inputs.pr }}
+            Finished nixpkgs-review for PR: ${{ steps.pre_notify.outputs.pr_link }}
 
             Run report: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
@@ -193,4 +190,4 @@ name: nixpkgs-review PR
         description: PR number
         required: true
         type: string
-run-name: 'nixpkgs-review #${{ github.event.inputs.pr }}'
+run-name: nixpkgs-review for PR ${{ github.event.inputs.pr }}
