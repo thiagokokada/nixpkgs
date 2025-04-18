@@ -105,7 +105,6 @@ in
                   };
                 }
                 { uses = "DeterminateSystems/nix-installer-action@v16"; }
-                { uses = "DeterminateSystems/magic-nix-cache-action@v8"; }
                 {
                   name = "Configure git";
                   run = ''
