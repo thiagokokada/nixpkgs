@@ -31,7 +31,7 @@
             pkgs.runCommand name
               {
                 buildInputs = with pkgs; [
-                  action-validator
+                  actionlint
                   yj
                 ];
                 json = builtins.toJSON (import ./actions/${name}.nix { inherit (nixpkgs) lib; });
@@ -40,17 +40,20 @@
               ''
                 mkdir -p $out
                 yj -jy < "$jsonPath" > $out/${name}.yml
-                action-validator -v $out/${name}.yml
+                actionlint -verbose $out/${name}.yml
               '';
           ghActionsYAMLs = map mkGHActionsYAML [
             "nixpkgs-review"
             "sync-fork"
           ];
+          resultDir = ".github/workflows";
         in
         {
           generate-gh-actions = pkgs.writeShellScriptBin "generate-gh-actions" ''
+            rm -rf "${resultDir}"
+            mkdir -p "${resultDir}"
             for dir in ${builtins.toString ghActionsYAMLs}; do
-              cp -f $dir/*.yml .github/workflows/
+              cp -f $dir/*.yml "${resultDir}"
             done
             echo Done!
           '';
