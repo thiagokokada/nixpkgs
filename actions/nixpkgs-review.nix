@@ -1,6 +1,26 @@
 { lib }:
 let
   recursiveMergeAttrs = builtins.foldl' lib.recursiveUpdate { };
+  args = [
+    {
+      arch = "aarch64-linux";
+      runs-on = "ubuntu-24.04-arm";
+      enable-free-disk = true;
+    }
+    {
+      arch = "x86_64-linux";
+      runs-on = "ubuntu-latest";
+      enable-free-disk = true;
+    }
+    {
+      arch = "aarch64-darwin";
+      runs-on = "macos-latest";
+    }
+    {
+      arch = "x86_64-darwin";
+      runs-on = "macos-13";
+    }
+  ];
 in
 {
   name = "nixpkgs-review PR";
@@ -9,10 +29,10 @@ in
     workflow_dispatch = {
       inputs =
         let
-          archOpt = arch: {
-            "build-on-${arch}" = {
+          archOpt = arg: {
+            "build-on-${arg.arch}" = {
               type = "boolean";
-              description = "Build on ${arch}";
+              description = "Build on ${arg.arch}";
               default = true;
               required = true;
             };
@@ -46,9 +66,7 @@ in
             required = true;
           };
         }
-        // (archOpt "x86_64-linux")
-        // (archOpt "aarch64-darwin")
-        // (archOpt "x86_64-darwin");
+        // recursiveMergeAttrs (builtins.map archOpt args);
     };
   };
 
@@ -71,9 +89,9 @@ in
           arch,
           runs-on,
           enable-free-disk ? false,
-        }@args:
+        }@arg:
         {
-          ${stepName args} = {
+          ${stepName arg} = {
             inherit runs-on;
             name = ''nixpkgs-review for PR ''${{ github.event.inputs.pr }} on ${arch}'';
             "if" = ''''${{ github.event.inputs.build-on-${arch} == 'true' }}'';
@@ -140,21 +158,6 @@ in
             );
           };
         };
-      args = [
-        {
-          arch = "x86_64-linux";
-          runs-on = "ubuntu-latest";
-          enable-free-disk = true;
-        }
-        {
-          arch = "aarch64-darwin";
-          runs-on = "macos-latest";
-        }
-        {
-          arch = "x86_64-darwin";
-          runs-on = "macos-13";
-        }
-      ];
     in
     recursiveMergeAttrs (builtins.map nixpkgsReviewForArch args)
     // {
