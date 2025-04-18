@@ -1,6 +1,7 @@
-{ lib }:
+{ lib, ... }:
 let
-  recursiveMergeAttrs = builtins.foldl' lib.recursiveUpdate { };
+  utils = import ./utils.nix { inherit lib; };
+  inherit (utils) escapeGhVar recursiveMergeAttrs;
   args = [
     {
       arch = "aarch64-linux";
@@ -24,7 +25,7 @@ let
 in
 {
   name = "nixpkgs-review PR";
-  run-name = ''nixpkgs-review for PR ''${{ github.event.inputs.pr }}'';
+  run-name = "nixpkgs-review for PR ${escapeGhVar "github.event.inputs.pr"}";
   on = {
     workflow_dispatch = {
       inputs =
@@ -71,14 +72,14 @@ in
   };
 
   concurrency = {
-    group = ''review-''${{ github.event.inputs.pr }}'';
+    group = "review-${escapeGhVar "github.event.inputs.pr"}";
     cancel-in-progress = true;
   };
 
   env = {
-    GITHUB_TOKEN = ''''${{ secrets.PAT_TOKEN }}'';
-    PR = ''''${{ github.event.inputs.pr }}'';
-    EXTRA_ARGS = ''''${{ github.event.inputs.extra-args }}'';
+    GITHUB_TOKEN = escapeGhVar "secrets.PAT_TOKEN";
+    PR = escapeGhVar "github.event.inputs.pr";
+    EXTRA_ARGS = escapeGhVar "github.event.inputs.extra-args";
   };
 
   jobs =
@@ -93,15 +94,15 @@ in
         {
           ${stepName arg} = {
             inherit runs-on;
-            name = ''nixpkgs-review for PR ''${{ github.event.inputs.pr }} on ${arch}'';
-            "if" = ''''${{ github.event.inputs.build-on-${arch} == 'true' }}'';
-            outputs.built = ''''${{ steps.output.outputs.built }}'';
+            name = "nixpkgs-review for PR ${escapeGhVar "github.event.inputs.pr"} on ${arch}";
+            "if" = escapeGhVar "github.event.inputs.build-on-${arch} == 'true'";
+            outputs.built = escapeGhVar "steps.output.outputs.built";
 
             steps = (
               builtins.filter (s: s != { }) [
                 (lib.optionalAttrs enable-free-disk {
                   uses = "thiagokokada/free-disk-space@main";
-                  "if" = ''''${{ github.event.inputs.free-space == 'true' }}'';
+                  "if" = escapeGhVar "github.event.inputs.free-space == 'true'";
                 })
                 {
                   uses = "actions/cache@v4";
@@ -114,7 +115,7 @@ in
                   uses = "actions/checkout@v4";
                   "with" = {
                     path = "nixpkgs";
-                    ref = ''''${{ github.event.inputs.branch }}'';
+                    ref = escapeGhVar "github.event.inputs.branch";
                     fetch-depth = 0;
                   };
                 }
@@ -176,13 +177,13 @@ in
           {
             uses = "appleboy/telegram-action@v1.0.1";
             "with" = {
-              to = ''''${{ secrets.TELEGRAM_TO }}'';
-              token = ''''${{ secrets.TELEGRAM_TOKEN }}'';
+              to = escapeGhVar "secrets.TELEGRAM_TO";
+              token = escapeGhVar "secrets.TELEGRAM_TOKEN";
               message =
                 ''
-                  Finished nixpkgs-review for PR: ''${{ steps.pre_notify.outputs.pr_link }}
+                  Finished nixpkgs-review for PR: ${escapeGhVar "steps.pre_notify.outputs.pr_link"}
 
-                  Run report: https://github.com/''${{ github.repository }}/actions/runs/''${{ github.run_id }}
+                  Run report: https://github.com/${escapeGhVar "github.repository"}/actions/runs/${escapeGhVar "github.run_id"}
 
                   Packages built:
                 ''

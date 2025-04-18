@@ -1,4 +1,8 @@
-{ ... }:
+{ lib, ... }:
+let
+  utils = import ./utils.nix { inherit lib; };
+  inherit (utils) escapeGhVar;
+in
 {
   name = "Sync fork with upstream";
   on = {
@@ -16,8 +20,8 @@
       {
         uses = "thiagokokada/merge-upstream@v1.0.2";
         "with" = {
-          branch = ''''${{ matrix.branch }}'';
-          token = ''''${{ secrets.PAT_TOKEN }}'';
+          branch = escapeGhVar "matrix.branch";
+          token = escapeGhVar "secrets.PAT_TOKEN";
         };
       }
     ];
