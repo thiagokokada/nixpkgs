@@ -83,7 +83,7 @@ in
               builtins.filter (s: s != { }) [
                 {
                   name = "Link to PR";
-                  run = ''echo "https://github.com/NixOS/nixpkgs/pull/$PR"'';
+                  run = ''echo "https://github.com/NixOS/nixpkgs/pull/''${PR//[^0-9]/}"'';
                 }
                 (lib.optionalAttrs enable-free-disk {
                   uses = "thiagokokada/free-disk-space@main";
@@ -119,7 +119,7 @@ in
                   run = ''
                     cd "$GITHUB_WORKSPACE/nixpkgs"
                     # shellcheck disable=SC2086
-                    nix run .#nixpkgs-review -- pr "$PR" --print-result --post-result --no-shell $EXTRA_ARGS
+                    nix run .#nixpkgs-review -- pr "''${PR//[^0-9]/}" --print-result --post-result --no-shell $EXTRA_ARGS
                   '';
                 }
                 {
