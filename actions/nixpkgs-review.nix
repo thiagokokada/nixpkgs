@@ -179,6 +179,7 @@ in
             "with" = {
               to = escapeGhVar "secrets.TELEGRAM_TO";
               token = escapeGhVar "secrets.TELEGRAM_TOKEN";
+              format = "html";
               message =
                 ''
                   Finished nixpkgs-review for PR: ${escapeGhVar "steps.pre_notify.outputs.pr_link"}
@@ -188,7 +189,7 @@ in
                   Packages built:
                 ''
                 + lib.concatStringsSep "\n" (
-                  builtins.map (a: ''- ${a.arch}: ''${{ needs.${stepName a}.outputs.built }}'') args
+                  builtins.map (a: "- ${a.arch}: <pre>${escapeGhVar "needs.${stepName a}.outputs.built"}</pre>") args
                 );
             };
           }
