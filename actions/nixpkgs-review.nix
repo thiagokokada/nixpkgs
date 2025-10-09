@@ -112,14 +112,19 @@ in
                   };
                 }
                 {
-                  uses = "actions/checkout@v4";
+                  uses = "actions/checkout@v5";
                   "with" = {
                     path = "nixpkgs";
                     ref = escapeGhVar "github.event.inputs.branch";
                     fetch-depth = 0;
                   };
                 }
-                { uses = "DeterminateSystems/nix-installer-action@v16"; }
+                {
+                  uses = "cachix/install-nix-action@v31";
+                  "with" = {
+                    github_access_token = escapeGhVar "secrets.GITHUB_TOKEN";
+                  };
+                }
                 {
                   name = "Configure git";
                   run = ''
@@ -180,17 +185,16 @@ in
               to = escapeGhVar "secrets.TELEGRAM_TO";
               token = escapeGhVar "secrets.TELEGRAM_TOKEN";
               format = "html";
-              message =
-                ''
-                  Finished nixpkgs-review for PR: ${escapeGhVar "steps.pre_notify.outputs.pr_link"}
+              message = ''
+                Finished nixpkgs-review for PR: ${escapeGhVar "steps.pre_notify.outputs.pr_link"}
 
-                  Run report: https://github.com/${escapeGhVar "github.repository"}/actions/runs/${escapeGhVar "github.run_id"}
+                Run report: https://github.com/${escapeGhVar "github.repository"}/actions/runs/${escapeGhVar "github.run_id"}
 
-                  Packages built:
-                ''
-                + lib.concatStringsSep "\n" (
-                  builtins.map (a: "- ${a.arch}: <pre>${escapeGhVar "needs.${stepName a}.outputs.built"}</pre>") args
-                );
+                Packages built:
+              ''
+              + lib.concatStringsSep "\n" (
+                builtins.map (a: "- ${a.arch}: <pre>${escapeGhVar "needs.${stepName a}.outputs.built"}</pre>") args
+              );
             };
           }
         ];
