@@ -11,6 +11,7 @@ jobs:
         branch:
           - master
           - staging
+          - staging-nixos
 name: Sync fork with upstream
 "on":
   schedule:

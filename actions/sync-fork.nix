@@ -14,6 +14,7 @@ in
     strategy.matrix.branch = [
       "master"
       "staging"
+      "staging-nixos"
     ];
     runs-on = "ubuntu-latest";
     steps = [
