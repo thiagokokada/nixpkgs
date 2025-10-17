@@ -4,13 +4,12 @@ You're probably looking for [the upstream
 repo](https://github.com/NixOS/nixpkgs).
 
 The actual branches from upstream are
-[`master`](https://github.com/thiagokokada/nixpkgs/tree/master) and
-[`staging`](https://github.com/thiagokokada/nixpkgs/tree/staging).
+[`master`](https://github.com/thiagokokada/nixpkgs/tree/master),
+[`staging`](https://github.com/thiagokokada/nixpkgs/tree/staging) and
+[`staging-nixos`](https://github.com/thiagokokada/nixpkgs/tree/staging-nixos).
 
-This branch includes some of my automation to help keep the branches above up
-to date (see [sync-fork](./actions/sync-fork.nix)) and also a way to run
-[nixpkgs-review](https://github.com/Mic92/nixpkgs-review) for a PR in upstream
-inside GitHub Actions (see [nixpkgs-review](./actions/nixpkgs-review.nix)).
+This branch include my automation to help keep the branches above up to date
+(see [sync-fork](./actions/sync-fork.nix)).
 
 It is [all generated from
 Nix](https://kokada.dev/blog/generating-yaml-files-with-nix/) instead of
@@ -39,6 +38,3 @@ To setup the actions, you will need to setup 3 secrets:
 
 - `GITHUB_TOKEN`: I recommend a PAT classic token with `repo` and `workflow`
   permissions
-- `TELEGRAM_TO`: the channel ID of the Telegram channel to notify
-- `TELEGRAM_TOKEN`: the token of the Telegram bot that will send the
-  notifications

@@ -42,10 +42,7 @@
                 yj -jy < "$jsonPath" > $out/${name}.yml
                 actionlint -verbose $out/${name}.yml
               '';
-          ghActionsYAMLs = map mkGHActionsYAML [
-            "nixpkgs-review"
-            "sync-fork"
-          ];
+          ghActionsYAMLs = map mkGHActionsYAML [ "sync-fork" ];
           resultDir = ".github/workflows";
         in
         {
