@@ -34,7 +34,7 @@ You can create a branch without parent in Git by using:
 git checkout --orphan fork
 ```
 
-To setup the actions, you will need to setup 3 secrets:
+To setup the actions, you will need to setup the following secret:
 
-- `GITHUB_TOKEN`: I recommend a PAT classic token with `repo` and `workflow`
+- `PAT_TOKEN`: I recommend a PAT classic token with `repo` and `workflow`
   permissions
