@@ -6,7 +6,14 @@
   gtk2,
   gdk-pixbuf,
   dbus-glib,
-  xorg,
+  libx11,
+  libxcomposite,
+  libxcursor,
+  libxdamage,
+  libxext,
+  libxi,
+  libxrender,
+  libxt,
   libpulseaudio,
   libGL,
   pango,
@@ -20,6 +27,9 @@
 stdenv.mkDerivation rec {
   pname = "seamonkey";
   version = "2.53.23";
+
+  strictDeps = true;
+  __structuredAttrs = true;
 
   # Upstream requires highly deprecated build tools to compile from source
   src = fetchurl {
@@ -43,14 +53,14 @@ stdenv.mkDerivation rec {
     pango
     freetype
     fontconfig
-    xorg.libXi
-    xorg.libXcursor
-    xorg.libXdamage
-    xorg.libXrender
-    xorg.libXcomposite
-    xorg.libXext
-    xorg.libX11
-    xorg.libXt
+    libxi
+    libxcursor
+    libxdamage
+    libxrender
+    libxcomposite
+    libxext
+    libx11
+    libxt
   ];
 
   installPhase = ''
