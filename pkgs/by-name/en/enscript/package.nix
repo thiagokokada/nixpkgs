@@ -40,6 +40,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = true;
 
+  __structuredAttrs = true;
+  strictDeps = true;
+
   meta = {
     description = "Converter from ASCII to PostScript, HTML, or RTF";
 
