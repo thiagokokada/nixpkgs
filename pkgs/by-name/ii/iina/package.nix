@@ -35,6 +35,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     maintainers = with lib.maintainers; [
       arkivm
       FlameFlag
+      kinnrai
       stepbrobd
     ];
     mainProgram = "iina";
