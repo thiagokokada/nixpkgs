@@ -82,6 +82,12 @@ buildGoModule (finalAttrs: {
     hash = "sha256-lichQPWqlphUjod3nsqJokDFIIEiwIykc9fWjSn5fzs=";
   };
 
+  overrideModAttrs = final: prev: {
+    # override output name so that we don't download the same modules every time
+    # for every component of the monorepo
+    name = "netbird-${finalAttrs.version}-go-modules";
+  };
+
   vendorHash = "sha256-5dZu6lmfwaUHusAlFS1qqorFbpa4anCUQDtg4Tv5mxw=";
 
   nativeBuildInputs = [ installShellFiles ] ++ lib.optional (componentName == "ui") pkg-config;
