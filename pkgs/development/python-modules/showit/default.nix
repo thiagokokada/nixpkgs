@@ -5,7 +5,7 @@
   setuptools,
   numpy,
   matplotlib,
-  pytest,
+  pytestCheckHook,
 }:
 
 buildPythonPackage {
@@ -13,11 +13,13 @@ buildPythonPackage {
   version = "1.1.4";
   pyproject = true;
 
+  __structuredAttrs = true;
+
   src = fetchFromGitHub {
     owner = "freeman-lab";
     repo = "showit";
     rev = "ef76425797c71fbe3795b4302c49ab5be6b0bacb"; # no tags in repo
-    sha256 = "0xd8isrlwwxlgji90lly1sq4l2a37rqvhsmyhv7bd3aj1dyjmdr6";
+    hash = "sha256-JrcqfQtSjbbOhr5quHE+QwlKsA6eUpCifLRzTrOOqHU=";
   };
 
   build-system = [ setuptools ];
@@ -27,11 +29,9 @@ buildPythonPackage {
     matplotlib
   ];
 
-  nativeCheckInputs = [ pytest ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
-  checkPhase = ''
-    pytest test
-  '';
+  pythonImportsCheck = [ "showit" ];
 
   meta = {
     description = "Simple and sensible display of images";
