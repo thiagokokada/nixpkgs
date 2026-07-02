@@ -6,15 +6,17 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "shellescape";
   version = "3.8.1";
   pyproject = true;
 
+  __structuredAttrs = true;
+
   src = fetchFromGitHub {
     owner = "chrissimpkins";
     repo = "shellescape";
-    rev = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-HAe3Qf3lLeVWw/tVkW0J+CfoxSoOnCcWDR2nEWZn7HM=";
   };
 
@@ -32,4 +34,4 @@ buildPythonPackage rec {
     ];
     maintainers = with lib.maintainers; [ veprbl ];
   };
-}
+})
