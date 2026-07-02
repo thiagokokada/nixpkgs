@@ -28,6 +28,7 @@
   pytestCheckHook,
   sqlalchemy,
   tabulate,
+  tensorboard,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -72,6 +73,7 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
     sqlalchemy
     tabulate
+    tensorboard
   ];
 
   disabledTestPaths = [
