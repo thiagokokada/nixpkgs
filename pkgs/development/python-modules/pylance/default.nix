@@ -28,6 +28,7 @@
   pandas,
   pillow,
   polars,
+  psutil,
   pytestCheckHook,
   tqdm,
 }:
@@ -94,6 +95,7 @@ buildPythonPackage (finalAttrs: {
     pandas
     pillow
     polars
+    psutil
     pytestCheckHook
     tqdm
   ]
