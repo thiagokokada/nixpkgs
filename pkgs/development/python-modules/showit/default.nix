@@ -2,6 +2,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
+  setuptools,
   numpy,
   matplotlib,
   pytest,
@@ -10,7 +11,7 @@
 buildPythonPackage {
   pname = "showit";
   version = "1.1.4";
-  format = "setuptools";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "freeman-lab";
@@ -19,7 +20,9 @@ buildPythonPackage {
     sha256 = "0xd8isrlwwxlgji90lly1sq4l2a37rqvhsmyhv7bd3aj1dyjmdr6";
   };
 
-  propagatedBuildInputs = [
+  build-system = [ setuptools ];
+
+  dependencies = [
     numpy
     matplotlib
   ];
