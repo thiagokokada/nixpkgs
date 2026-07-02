@@ -3,10 +3,12 @@
   stdenv,
   fetchFromGitHub,
   fetchPypi,
+  fetchpatch,
   callPackage,
   nixosTests,
   gettext,
-  python3,
+  # tests fail and eventually lock up on 3.14
+  python313,
   ghostscript_headless,
   imagemagickBig,
   jbig2enc,
@@ -40,9 +42,21 @@ let
 
     # tesseract5 may be overwritten in the paperless module and we need to propagate that to make the closure reduction effective
     ocrmypdf = prev.ocrmypdf_16.override { tesseract = tesseract5; };
+
+    # these are broken on 3.13
+    google-cloud-firestore = null;
+    google-cloud-iam = null;
+    google-cloud-kms = null;
+    google-cloud-monitoring = null;
+    google-cloud-pubsub = null;
+    google-cloud-storage = null;
+
+    # these depend on google-cloud stuff in tests
+    celery = prev.celery.overridePythonAttrs { doCheck = false; };
+    kombu = prev.kombu.overridePythonAttrs { doCheck = false; };
   };
 
-  python = python3.override {
+  python = python313.override {
     self = python;
     packageOverrides = lib.composeManyExtensions [
       defaultPythonPackageOverrides
@@ -83,6 +97,15 @@ python.pkgs.buildPythonApplication (finalAttrs: {
     hash = "sha256-Czh4Knel0IIHsTc3kEnp1153Kv+3721GRCbTYTkeCDg=";
   };
 
+  patches = [
+    # fix tests with latest filelock
+    (fetchpatch {
+      url = "https://github.com/paperless-ngx/paperless-ngx/commit/5e1202a4168fbc8e36f816f36eb16dd7636e9d9c.diff";
+      includes = [ "src/*" ];
+      hash = "sha256-ZDC+T4DyOBBV8SCw8xyeYGua1XOhiP7eoZthnSE/Fkk=";
+    })
+  ];
+
   postPatch = ''
     # pytest-xdist with to many threads makes the tests flaky
     if (( $NIX_BUILD_CORES > 3)); then
@@ -114,6 +137,7 @@ python.pkgs.buildPythonApplication (finalAttrs: {
     # requested by maintainer
     "imap-tools"
     "ocrmypdf"
+    "filelock"
   ];
 
   dependencies =

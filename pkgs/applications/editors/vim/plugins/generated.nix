@@ -13663,12 +13663,12 @@ final: prev: {
 
   nvim-test = buildVimPlugin {
     pname = "nvim-test";
-    version = "1.4.1";
+    version = "1.4.1-unstable-2026-7-2";
     src = fetchFromGitHub {
       owner = "klen";
       repo = "nvim-test";
-      tag = "1.4.1";
-      hash = "sha256-mMi07UbMWmC75DFfW1b+sR2uRPxizibFwS2qcN9rpLI=";
+      rev = "feb834cbc806029239479f501e8492c01a2bea65";
+      hash = "sha256-DTns8LG3PFFKYG6Ayt90Brf2lbZjNfDLLKUDxsqMisk=";
     };
     meta.homepage = "https://github.com/klen/nvim-test/";
     meta.license = getLicenseFromSpdxId "MIT";
