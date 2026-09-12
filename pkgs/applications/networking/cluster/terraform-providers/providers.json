@@ -36,13 +36,13 @@
     "vendorHash": "sha256-TXeJPVyb3+t1wJyHXNbmy6iPrPTG47bedHB0UyEUv98="
   },
   "akamai_akamai": {
-    "hash": "sha256-XGTdfOUr3Nb2vV49aGZThuae/n9KrM3NZ8A0P/LrSXg=",
+    "hash": "sha256-ui8w8z9kROptw0tCvtT645bbNJV/BRd10aVomwhl+hI=",
     "homepage": "https://registry.terraform.io/providers/akamai/akamai",
     "owner": "akamai",
     "repo": "terraform-provider-akamai",
-    "rev": "v10.4.0",
+    "rev": "v11.0.0",
     "spdx": "MPL-2.0",
-    "vendorHash": "sha256-DTPaRkNWitoriOE0G+RctMIHAdSPK4wq410a+XxLnOY="
+    "vendorHash": "sha256-d9hJUjHczxy2/3bOmEYjTxKDIRc6Cox4sr5k40ZHWFE="
   },
   "aliyun_alicloud": {
     "hash": "sha256-caOnwD9wXa533I2kUpcbMwAJUUcSzyZNY4LIgJQjdc0=",
@@ -137,13 +137,13 @@
     "vendorHash": "sha256-TLNHhSyMw0rKFtd9EChg7zSGoxe57rh36nAPqu1j8w8="
   },
   "buildkite_buildkite": {
-    "hash": "sha256-Hq2I9/Fnery1CUWdOTu2hJQ0EwYN+Dw8yPb4mZsuYzU=",
+    "hash": "sha256-sqtC0Wkme+90jKdJCTVuOxkzeWnt/uQ8/y/d5bJoL/w=",
     "homepage": "https://registry.terraform.io/providers/buildkite/buildkite",
     "owner": "buildkite",
     "repo": "terraform-provider-buildkite",
-    "rev": "v1.39.1",
+    "rev": "v1.39.2",
     "spdx": "MIT",
-    "vendorHash": "sha256-QmtHr/zjSoqpiRepLjzMN+QLPUccaIXQPrLYHihm2/o="
+    "vendorHash": "sha256-VvihinrizplJmIyXyLsvYjj0uwS06xTH5SiTZlTdYWE="
   },
   "camptocamp_pass": {
     "hash": "sha256-GQ2g7VyK+eeBqW3LMR4U0gMYsvQnG3y+KEKKkvnmfsk=",
@@ -346,13 +346,13 @@
     "vendorHash": "sha256-fP6brpY/wRI1Yjgapzi+FfOci65gxWeOZulXbGdilrE="
   },
   "dnsimple_dnsimple": {
-    "hash": "sha256-YkoBGPcNKBeAHWcsRldHSsZ/hvWngCiySjK5zzI9jNE=",
+    "hash": "sha256-eprmwEPBGYCCoic4Y2nClxaGjXAD5AFdmuvRUzdnAG8=",
     "homepage": "https://registry.terraform.io/providers/dnsimple/dnsimple",
     "owner": "dnsimple",
     "repo": "terraform-provider-dnsimple",
-    "rev": "v2.2.0",
+    "rev": "v2.2.1",
     "spdx": "MPL-2.0",
-    "vendorHash": "sha256-SuwDjQMgzcnNsBf/wXZvys6VINgnFeaWcV7jIMbNXo8="
+    "vendorHash": "sha256-Co7Rbjxi3cUglxVx7O3cXTA4r0SUUMv/EWHid5K+ILM="
   },
   "dnsmadeeasy_dme": {
     "hash": "sha256-JH9YcM9Fvd1x0BJpLUZCm6a9hZZxySrkFVLP89FO3fU=",
@@ -733,11 +733,11 @@
     "vendorHash": "sha256-s9tdthUzIdisP0XB9V+HGlWgZCXnOodz9Atu/XyDKf4="
   },
   "huaweicloud_huaweicloud": {
-    "hash": "sha256-ncTEM+7zS5P2fhXcB0wa8NatbJg9g2XHm2FGWqp6jx8=",
+    "hash": "sha256-r4SwNOQ2P9IdxAvPnIuJEolXfhI/GKSPUZ+yjBS7pKA=",
     "homepage": "https://registry.terraform.io/providers/huaweicloud/huaweicloud",
     "owner": "huaweicloud",
     "repo": "terraform-provider-huaweicloud",
-    "rev": "v1.97.2",
+    "rev": "v1.98.2",
     "spdx": "MPL-2.0",
     "vendorHash": null
   },
