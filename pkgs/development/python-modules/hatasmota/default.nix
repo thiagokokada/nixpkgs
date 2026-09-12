@@ -4,7 +4,6 @@
   attrs,
   buildPythonPackage,
   fetchFromGitHub,
-  pythonOlder,
   setuptools,
   voluptuous,
 }:
@@ -13,8 +12,6 @@ buildPythonPackage (finalAttrs: {
   pname = "hatasmota";
   version = "0.10.2";
   pyproject = true;
-
-  disabled = pythonOlder "3.13";
 
   src = fetchFromGitHub {
     owner = "emontnemery";
