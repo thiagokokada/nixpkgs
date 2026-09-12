@@ -41,7 +41,23 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "lib"
     "dev"
+    "proto"
   ];
+
+  outputChecks = {
+    out.disallowedReferences = [
+      "dev"
+    ];
+    lib.disallowedReferences = [
+      "out"
+      "dev"
+    ];
+    proto.disallowedReferences = [
+      "out"
+      "lib"
+      "dev"
+    ];
+  };
 
   patches =
     lib.optionals (lib.versionOlder version "22") [
@@ -178,6 +194,23 @@ stdenv.mkDerivation (finalAttrs: {
   env = lib.optionalAttrs (lib.versions.major version == "29") {
     GTEST_DEATH_TEST_STYLE = "threadsafe";
   };
+
+  # protoc expects to find `.proto` files relative to itself, so we put those to a separate output and add symlinks.
+  postFixup = ''
+    pushd "$dev" > /dev/null
+
+    find include -name '*.proto' -print0 | while IFS= read -r -d ''' FILE; do
+      mkdir -p "$proto/$(dirname "$FILE")"
+      mkdir -p "$out/$(dirname "$FILE")"
+
+      mv "$FILE" "$proto/$FILE"
+
+      ln -s "$proto/$FILE" "$out/$FILE"
+      ln -s "$proto/$FILE" "$dev/$FILE"
+    done
+
+    popd > /dev/null
+  '';
 
   passthru = {
     tests = {
