@@ -23,7 +23,7 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "ytmdesktop";
-  version = "2.0.11";
+  version = "2.0.12";
 
   src = fetchFromGitHub {
     owner = "ytmdesktop";
@@ -50,7 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
       }
     '';
 
-    hash = "sha256-Frw4Bn9/koeRl6Wl6ykiIdb3+wIMhVRfgHhMZhzgqVc=";
+    hash = "sha256-fT5UdJ9YYK3hXC8GkEeJ/LK1bCyXofcKA0aCJUnjZdk=";
   };
 
   patches = [
@@ -74,8 +74,8 @@ stdenv.mkDerivation (finalAttrs: {
   missingHashes = ./missing-hashes.json;
 
   yarnOfflineCache = yarn-berry.fetchYarnBerryDeps {
-    inherit (finalAttrs) src patches missingHashes;
-    hash = "sha256-YBZRfr6RU4f+9KXgKJcTF0P08er7eyiv8jVULVIYWXI=";
+    inherit (finalAttrs) src missingHashes patches;
+    hash = "sha256-fpvBE4QZcDaWGgqU3jQlOe+bOLtnDEVNR4IuKBo35BQ=";
   };
 
   nativeBuildInputs = [

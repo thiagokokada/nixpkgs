@@ -3,7 +3,6 @@
   stdenv,
   nodejs,
   fetchFromGitHub,
-  substitute,
   yarn-berry_4,
   python3,
   pkg-config,
@@ -16,7 +15,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "joplin-cli";
-  version = "3.6.2";
+  version = "3.7.1";
 
   src = fetchFromGitHub {
     owner = "laurent22";
@@ -25,22 +24,8 @@ stdenv.mkDerivation (finalAttrs: {
     postFetch = ''
       # there's a file with a weird name that causes a hash mismatch on darwin
       rm $out/packages/app-cli/tests/support/photo*
-
-      # Remove when updating since upstream has updated Yarn
-      # https://github.com/laurent22/joplin/commit/071f205c44da8e2979dcf53a4105648bfa0e7f83
-      cd $out
-      patch -p1 < ${
-        (substitute {
-          src = ./yarn-fix.patch;
-          substitutions = [
-            "--replace-fail"
-            "YARN_LOCKFILE_VERSION_PLACEHOLDER"
-            yarn-berry_4.lockfileVersion
-          ];
-        })
-      }
     '';
-    hash = "sha256-LSkiW3Kwtjsk2LLM/MXo6ErR+G8b7IX3LkEtDJlc7ok=";
+    hash = "sha256-4o8mao7wAqDzwQgJ4QY+DPs9rtsnga6LLnq744l7HVM=";
   };
 
   missingHashes = ./missing-hashes.json;
@@ -51,7 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
       missingHashes
       postPatch
       ;
-    hash = "sha256-EHHAB20syDakpN4TGuLCc1v2AGEJPc3y7uCpS+PVzzQ=";
+    hash = "sha256-CHjvFu6r5zak19dqtRkcGkPhPoKgt1nkBVa71ZcvdgE=";
   };
 
   nativeBuildInputs = [
