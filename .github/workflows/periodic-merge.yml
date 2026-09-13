@@ -66,4 +66,4 @@ jobs:
             Periodic merge from `${{ inputs.from }}` into [`${{ inputs.into }}`](https://github.com/NixOS/nixpkgs/tree/${{ inputs.into }}) has [failed](https://github.com/NixOS/nixpkgs/actions/runs/${{ github.run_id }}).
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          gh pr comment 105153 --body "$BODY_TEXT"
+          gh issue comment 562905 --body "$BODY_TEXT"
