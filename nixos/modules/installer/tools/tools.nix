@@ -53,13 +53,17 @@ let
   nixos-version = makeProg {
     name = "nixos-version";
     src = ./nixos-version.sh;
-    replacements = {
+    replacements = rec {
       inherit (pkgs) runtimeShell;
       inherit (config.system.nixos) version codeName revision;
       inherit (config.system) configurationRevision;
+      specialisations = lib.attrNames config.specialisation;
+      kernelVersion = config.boot.kernelPackages.kernel.version;
+
       json = builtins.toJSON (
         {
           nixosVersion = config.system.nixos.version;
+          inherit kernelVersion specialisations;
         }
         // lib.optionalAttrs (config.system.nixos.revision != null) {
           nixpkgsRevision = config.system.nixos.revision;
